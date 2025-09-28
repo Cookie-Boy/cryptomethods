@@ -205,6 +205,58 @@ public class InputHandler {
         return new BigInteger[] { p, g, xA, xB };
     }
 
+    public static BigInteger[] handleShamir() {
+        System.out.println("\n=== SHAMIR ENCRYPTION ===");
+        System.out.println("1. Enter numbers 'p', 'Ca', 'Cb''");
+        System.out.println("2. Generate numbers 'P', 'Ca', 'Cb'");
+        System.out.print("Select an option (1-2): ");
+
+        int choice = getIntInput();
+
+        BigInteger p, cA, cB, dA, dB;
+        switch (choice) {
+            case 1:
+                System.out.print("Enter number p: ");
+                do {
+                    p = getBigIntegerInput();
+                } while(!FermatTest.check(p, 100));
+                do {
+                    System.out.print("Enter number Ca: ");
+                    cA = getBigIntegerInput();
+                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                do {
+                    System.out.print("Enter number Cb: ");
+                    cB = getBigIntegerInput();
+                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                System.out.println("You entered:");
+                break;
+            case 2:
+                p = generatePrimeNumber(100);
+                do {
+                    cA = generateRandomBigInteger(new BigInteger("0"), p);
+                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+
+                do {
+                    cB = generateRandomBigInteger(new BigInteger("0"), p);
+                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                System.out.println("Generated values:");
+                break;
+            default:
+                System.out.println("Wrong choice.");
+                return null;
+        }
+        dA = ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA).getY();
+        dB = ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB).getY();
+        dA = dA.signum() < 0? dA.add(p.subtract(BigInteger.ONE)) : dA;
+        dB = dB.signum() < 0? dB.add(p.subtract(BigInteger.ONE)) : dB;
+        System.out.println("p =" + p + " Ca = " + cA + " Cb = " + cB + " Da = " + dA + " Db = " + dB);
+        return new BigInteger[] { p, cA, cB, dA, dB};
+    }
+
     private static BigInteger getBigIntegerInput() {
         while (true) {
             try {

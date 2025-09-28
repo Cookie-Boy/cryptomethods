@@ -1,8 +1,6 @@
 package ru.sibsutis.cryptomethods;
 
-import ru.sibsutis.cryptomethods.methods.BabyAndGiantStep;
-import ru.sibsutis.cryptomethods.methods.DiffHellman;
-import ru.sibsutis.cryptomethods.methods.PowerMod;
+import ru.sibsutis.cryptomethods.methods.*;
 import ru.sibsutis.cryptomethods.utilities.*;
 
 import java.math.BigInteger;
@@ -17,8 +15,9 @@ public class CryptoLibrary {
             System.out.println("3. Generalized Euclidean Algorithm");
             System.out.println("4. Baby's Step, Giant's Step");
             System.out.println("5. Diffi Hellman");
+            System.out.println("6. Shamir's cypher");
             System.out.println("0. Exit");
-            System.out.print("Select an option (0-5): ");
+            System.out.print("Select an option (0-6): ");
 
             int choice = InputHandler.getIntInput();
 
@@ -61,6 +60,11 @@ public class CryptoLibrary {
                     if (args == null) break;
                     BigInteger sharedKey = DiffHellman.calculate(args[0], args[1], args[2], args[3]);
                     System.out.println("result = " + sharedKey);
+                    break;
+                case 6:
+                    args = InputHandler.handleShamir();
+                    if (args == null) break;
+                    ShamirCypher.calculate(args[0], args[1], args[2], args[3], args[4]);
                     break;
                 case 0:
                     System.out.println("Exit...");
