@@ -1,6 +1,6 @@
 package ru.sibsutis.cryptomethods.utilities;
 
-import ru.sibsutis.cryptomethods.CryptoLibrary;
+import ru.sibsutis.cryptomethods.methods.PowerMod;
 
 import java.math.BigInteger;
 import java.util.Scanner;
@@ -169,7 +169,7 @@ public class InputHandler {
 
         int choice = getIntInput();
 
-        BigInteger p, g, xA, xB;
+        BigInteger q, p, g, xA, xB;
         switch (choice) {
             case 1:
                 System.out.print("Enter number p: ");
@@ -184,9 +184,15 @@ public class InputHandler {
                 break;
             case 2:
                 do {
-                    p = generatePrimeNumber(50).multiply(BigInteger.TWO).add(BigInteger.ONE);
+                    q = generatePrimeNumber(50);
+                    p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
                 } while (!FermatTest.check(p, 50));
-                g = generatePrimeNumber(50);
+
+                for (g = BigInteger.TWO; g.compareTo(p.subtract(BigInteger.ONE)) < 0; g = g.add(BigInteger.ONE)) {
+                    if (PowerMod.calculate(g, q, p).compareTo(BigInteger.ONE) != 0) {
+                        break;
+                    }
+                }
                 xA = generateRandomBigInteger();
                 xB = generateRandomBigInteger();
                 System.out.println("Generated values:");

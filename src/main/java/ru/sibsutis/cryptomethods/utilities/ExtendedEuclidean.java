@@ -4,6 +4,8 @@ import java.math.BigInteger;
 
 public class ExtendedEuclidean {
     public static EuclideanResult calculate(BigInteger a, BigInteger b) {
+        // a должно быть больше b
+        // если результат - отрицательное число, то добавляем к нему p - 1
         EuclideanResult u = new EuclideanResult(a, BigInteger.ONE, BigInteger.ZERO);
         EuclideanResult v = new EuclideanResult(b, BigInteger.ZERO, BigInteger.ONE);
 

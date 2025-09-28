@@ -1,7 +1,6 @@
-package ru.sibsutis.cryptomethods;
+package ru.sibsutis.cryptomethods.utilities;
 
-import ru.sibsutis.cryptomethods.utilities.Generator;
-import ru.sibsutis.cryptomethods.utilities.PowerMod;
+import ru.sibsutis.cryptomethods.methods.PowerMod;
 
 import java.math.BigInteger;
 
@@ -22,7 +21,7 @@ public class NetUser {
     }
 
     public void createSharedKey(BigInteger publicKey, BigInteger p) {
-        sharedKey = PowerMod.calculate(publicKey, secret, p);
+        this.sharedKey = PowerMod.calculate(publicKey, secret, p);
     }
 
     public BigInteger getSharedKey() {

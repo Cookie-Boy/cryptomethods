@@ -6,7 +6,7 @@ public class Generator {
     private static final int BIT_LENGTH = 512;
 
     public static BigInteger generateRandomBigInteger() {
-        return new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e9));
+        return new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e10));
     }
 
     public static BigInteger generatePrimeNumber(BigInteger k) {
@@ -17,7 +17,7 @@ public class Generator {
         BigInteger candidate;
 
         do {
-            candidate = new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e9));
+            candidate = new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e10));
             if (!candidate.testBit(0)) {
                 candidate = candidate.setBit(0);
             }

@@ -1,5 +1,7 @@
 package ru.sibsutis.cryptomethods.utilities;
 
+import ru.sibsutis.cryptomethods.methods.PowerMod;
+
 import java.math.BigInteger;
 import java.util.Random;
 

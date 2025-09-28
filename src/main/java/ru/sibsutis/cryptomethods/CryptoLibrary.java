@@ -1,5 +1,8 @@
 package ru.sibsutis.cryptomethods;
 
+import ru.sibsutis.cryptomethods.methods.BabyAndGiantStep;
+import ru.sibsutis.cryptomethods.methods.DiffHellman;
+import ru.sibsutis.cryptomethods.methods.PowerMod;
 import ru.sibsutis.cryptomethods.utilities.*;
 
 import java.math.BigInteger;
