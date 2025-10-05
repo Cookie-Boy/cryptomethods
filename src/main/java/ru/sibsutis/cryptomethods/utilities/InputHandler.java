@@ -257,6 +257,55 @@ public class InputHandler {
         return new BigInteger[] { p, cA, cB, dA, dB};
     }
 
+    public static BigInteger[] handleEl_Gamal() {
+        System.out.println("\n=== El'Gamal ===");
+        System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.print("Select an option (1-2): ");
+
+        int choice = getIntInput();
+
+        BigInteger q, p, g, xA, xB;
+        switch (choice) {
+            case 1:
+                System.out.print("Enter number p: ");
+                p = getBigIntegerInput();
+                System.out.print("Enter number g: ");
+                g = getBigIntegerInput();
+                do {
+                    System.out.print("Enter number Xa: ");
+                    xA = getBigIntegerInput();
+                } while(xA.compareTo(p) > 0);
+                do {
+                    System.out.print("Enter number Xb: ");
+                    xB = getBigIntegerInput();
+                } while(xB.compareTo(p) > 0);
+                System.out.println("You entered:");
+                break;
+            case 2:
+                do {
+                    q = generatePrimeNumber(50);
+                    p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
+                } while (!FermatTest.check(p, 50));
+
+                for (g = BigInteger.TWO; g.compareTo(p.subtract(BigInteger.ONE)) < 0; g = g.add(BigInteger.ONE)) {
+                    if (PowerMod.calculate(g, q, p).compareTo(BigInteger.ONE) != 0) {
+                        break;
+                    }
+                }
+                xA = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                xB = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                System.out.println("Generated values:");
+                System.out.println("p = " + p + ", g = " + g + ", Xa = " + xA + ", Xb = " + xB);
+                break;
+            default:
+                System.out.println("Wrong choice.");
+                return null;
+        }
+
+        return new BigInteger[] { p, g, xA, xB };
+    }
+
     private static BigInteger getBigIntegerInput() {
         while (true) {
             try {
@@ -275,6 +324,16 @@ public class InputHandler {
             scanner.next();
         }
         int result = scanner.nextInt();
+        scanner.nextLine();
+        return result;
+    }
+
+    public static String getStringInput() {
+        while (!scanner.hasNext()) {
+            System.out.print("Please enter an string: ");
+            scanner.next();
+        }
+        String result = scanner.next();
         scanner.nextLine();
         return result;
     }

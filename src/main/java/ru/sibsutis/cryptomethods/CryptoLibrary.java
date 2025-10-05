@@ -16,8 +16,9 @@ public class CryptoLibrary {
             System.out.println("4. Baby's Step, Giant's Step");
             System.out.println("5. Diffi Hellman");
             System.out.println("6. Shamir's cypher");
+            System.out.println("7. El'Gamal's cypher");
             System.out.println("0. Exit");
-            System.out.print("Select an option (0-6): ");
+            System.out.print("Select an option (0-7): ");
 
             int choice = InputHandler.getIntInput();
 
@@ -65,6 +66,13 @@ public class CryptoLibrary {
                     args = InputHandler.handleShamir();
                     if (args == null) break;
                     ShamirCypher.calculate(args[0], args[1], args[2], args[3], args[4]);
+                    break;
+                case 7:
+                    args = InputHandler.handleEl_Gamal();
+                    String path = InputHandler.getStringInput();
+                    if (args == null) break;
+                    String ePath = El_GamalManager.Encrypt(args, path);
+                    El_GamalManager.Decrypt(args, ePath);
                     break;
                 case 0:
                     System.out.println("Exit...");
