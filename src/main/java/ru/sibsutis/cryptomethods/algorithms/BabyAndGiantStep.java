@@ -1,4 +1,6 @@
-package ru.sibsutis.cryptomethods.methods;
+package ru.sibsutis.cryptomethods.algorithms;
+
+import ru.sibsutis.cryptomethods.core.PowerMod;
 
 import java.math.BigInteger;
 import java.util.HashMap;

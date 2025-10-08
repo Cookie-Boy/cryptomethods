@@ -1,4 +1,4 @@
-package ru.sibsutis.cryptomethods.utilities;
+package ru.sibsutis.cryptomethods.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

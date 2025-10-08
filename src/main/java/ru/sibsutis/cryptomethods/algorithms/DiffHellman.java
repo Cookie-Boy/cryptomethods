@@ -1,6 +1,6 @@
-package ru.sibsutis.cryptomethods.methods;
+package ru.sibsutis.cryptomethods.algorithms;
 
-import ru.sibsutis.cryptomethods.utilities.NetUser;
+import ru.sibsutis.cryptomethods.core.NetUser;
 
 import java.math.BigInteger;
 

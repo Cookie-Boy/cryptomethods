@@ -1,16 +1,22 @@
-package ru.sibsutis.cryptomethods.utilities;
+package ru.sibsutis.cryptomethods.core;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public class Generator {
     private static final int BIT_LENGTH = 512;
+    private static final SecureRandom random = new SecureRandom();
 
     public static BigInteger generateRandomBigInteger() {
-        return new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e10));
+        return new BigInteger(BIT_LENGTH, random).mod(BigInteger.valueOf((long) 1e10));
+    }
+
+    public static BigInteger generateRandomBigInteger(BigInteger max) {
+        return new BigInteger(BIT_LENGTH, random).mod(max);
     }
 
     public static BigInteger generateRandomBigInteger(BigInteger min, BigInteger max) {
-        return new BigInteger(BIT_LENGTH, FermatTest.random).mod(max.subtract(min)).add(min);
+        return new BigInteger(BIT_LENGTH, random).mod(max.subtract(min)).add(min);
     }
 
     public static BigInteger generatePrimeNumber(BigInteger k, BigInteger min, BigInteger max) {

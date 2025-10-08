@@ -1,12 +1,14 @@
-package ru.sibsutis.cryptomethods.utilities;
+package ru.sibsutis.cryptomethods.io;
 
-import ru.sibsutis.cryptomethods.methods.PowerMod;
+import ru.sibsutis.cryptomethods.core.ExtendedEuclidean;
+import ru.sibsutis.cryptomethods.core.FermatTest;
+import ru.sibsutis.cryptomethods.core.PowerMod;
 
 import java.math.BigInteger;
 import java.util.Scanner;
 
-import static ru.sibsutis.cryptomethods.utilities.Generator.generatePrimeNumber;
-import static ru.sibsutis.cryptomethods.utilities.Generator.generateRandomBigInteger;
+import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
+import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
 
 public class InputHandler {
     private static final Scanner scanner = new Scanner(System.in);

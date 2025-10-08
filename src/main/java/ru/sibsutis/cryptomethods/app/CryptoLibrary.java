@@ -1,7 +1,11 @@
-package ru.sibsutis.cryptomethods;
+package ru.sibsutis.cryptomethods.app;
 
-import ru.sibsutis.cryptomethods.methods.*;
-import ru.sibsutis.cryptomethods.utilities.*;
+import ru.sibsutis.cryptomethods.core.EuclideanResult;
+import ru.sibsutis.cryptomethods.core.ExtendedEuclidean;
+import ru.sibsutis.cryptomethods.core.FermatTest;
+import ru.sibsutis.cryptomethods.core.PowerMod;
+import ru.sibsutis.cryptomethods.algorithms.*;
+import ru.sibsutis.cryptomethods.io.*;
 
 import java.math.BigInteger;
 
@@ -24,6 +28,7 @@ public class CryptoLibrary {
 
             BigInteger[] args;
             BigInteger a, x, p, result;
+            String fileName, encFileName;
 
             switch (choice) {
                 case 1:
@@ -66,13 +71,26 @@ public class CryptoLibrary {
                     args = InputHandler.handleShamir();
                     if (args == null) break;
                     ShamirCypher.calculate(args[0], args[1], args[2], args[3], args[4]);
+
+                    System.out.print("Enter filename: ");
+                    fileName = InputHandler.getStringInput();
+
+                    encFileName = ShamirCypher.encryptFile(fileName, args[0], args[1], args[2]);
+                    System.out.println("File successfully encrypted.");
+                    ShamirCypher.decryptFile(encFileName, args[0], args[3], args[4]);
+                    System.out.println("File successfully decrypted.");
                     break;
                 case 7:
                     args = InputHandler.handleEl_Gamal();
-                    String path = InputHandler.getStringInput();
                     if (args == null) break;
-                    String ePath = El_GamalManager.Encrypt(args, path);
-                    El_GamalManager.Decrypt(args, ePath);
+
+                    System.out.print("Enter filename: ");
+                    fileName = InputHandler.getStringInput();
+
+                    encFileName = ElGamalCypher.encryptFile(args[0], args[1], fileName);
+                    System.out.println("File successfully encrypted.");
+                    ElGamalCypher.decryptFile(args[0], encFileName);
+                    System.out.println("File successfully decrypted.");
                     break;
                 case 0:
                     System.out.println("Exit...");
