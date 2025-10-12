@@ -24,7 +24,7 @@ public class CryptoLibrary {
             System.out.println("7. El'Gamal's cypher");
             System.out.println("8. RSA cypher");
             System.out.println("0. Exit");
-            System.out.print("Select an option (0-7): ");
+            System.out.print("Select an option (0-8): ");
 
             int choice = ConsoleInput.readInt();
 
@@ -101,9 +101,9 @@ public class CryptoLibrary {
                     System.out.print("Enter filename: ");
                     fileName = ConsoleInput.readString();
 
-//                    encFileName = RSACypher.encryptFile(args[0], args[1], fileName);
+                    encFileName = RSACypher.encryptFile(args[0], args[1], fileName);
                     System.out.println("File successfully encrypted.");
-//                    RSACypher.decryptFile(args[0], encFileName);
+                    RSACypher.decryptFile(args[0], args[2], encFileName);
                     System.out.println("File successfully decrypted.");
                     break;
                 case 0:

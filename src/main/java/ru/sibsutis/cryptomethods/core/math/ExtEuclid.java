@@ -2,10 +2,15 @@ package ru.sibsutis.cryptomethods.core.math;
 
 import java.math.BigInteger;
 
+import static java.util.Collections.swap;
+
 public class ExtEuclid {
     public static EuclidResult calculate(BigInteger a, BigInteger b) {
-        // a должно быть больше b
-        // если результат - отрицательное число, то добавляем к нему p - 1
+        if(a.compareTo(b) < 0) {
+            BigInteger tmp = a;
+            a = b;
+            b = tmp;
+        }
         EuclidResult u = new EuclidResult(a, BigInteger.ONE, BigInteger.ZERO);
         EuclidResult v = new EuclidResult(b, BigInteger.ZERO, BigInteger.ONE);
 

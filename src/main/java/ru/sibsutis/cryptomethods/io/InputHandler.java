@@ -1,5 +1,6 @@
 package ru.sibsutis.cryptomethods.io;
 
+import ru.sibsutis.cryptomethods.core.Generator;
 import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
 import ru.sibsutis.cryptomethods.core.math.FermatTest;
 import ru.sibsutis.cryptomethods.core.math.PowerMod;
@@ -312,50 +313,41 @@ public class InputHandler {
 
     public static BigInteger[] handleRSA() {
         System.out.println("\n=== RSA Cypher ===");
-        System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
-        System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.println("1. Enter numbers 'p', 'q'");
+        System.out.println("2. Generate numbers 'p', 'q'");
         System.out.print("Select an option (1-2): ");
 
         int choice = readInt();
 
-        BigInteger q, p, g, xA, xB;
+        BigInteger q, p, N, f, d, c;
         switch (choice) {
             case 1:
-                System.out.print("Enter number p: ");
-                p = readBigInt();
-                System.out.print("Enter number g: ");
-                g = readBigInt();
                 do {
-                    System.out.print("Enter number Xa: ");
-                    xA = readBigInt();
-                } while(xA.compareTo(p) > 0);
+                    System.out.print("Enter number p: ");
+                    p = readBigInt();
+                } while(!FermatTest.check(p, 100));
                 do {
-                    System.out.print("Enter number Xb: ");
-                    xB = readBigInt();
-                } while(xB.compareTo(p) > 0);
-                System.out.println("You entered:");
+                    System.out.print("Enter number q: ");
+                    q = readBigInt();
+                } while(!FermatTest.check(q, 100));
+                System.out.println("You entered: p = " + p + " q = " + q);
                 break;
             case 2:
-                do {
-                    q = generatePrimeNumber(50);
-                    p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
-                } while (!FermatTest.check(p, 50));
-
-                for (g = BigInteger.TWO; g.compareTo(p.subtract(BigInteger.ONE)) < 0; g = g.add(BigInteger.ONE)) {
-                    if (PowerMod.calculate(g, q, p).compareTo(BigInteger.ONE) != 0) {
-                        break;
-                    }
-                }
-                xA = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
-                xB = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
-                System.out.println("Generated values:");
-                System.out.println("p = " + p + ", g = " + g + ", Xa = " + xA + ", Xb = " + xB);
+                q = generatePrimeNumber(50);
+                p = generatePrimeNumber(50);
+                System.out.println("p = " + p + ", q = " + q);
                 break;
             default:
                 System.out.println("Wrong choice.");
                 return null;
         }
-
-        return new BigInteger[] { p, g, xA, xB }; // !
+        N = p.multiply(q);
+        f = N.subtract(p).subtract(q).add(BigInteger.ONE);
+        do {
+            d = Generator.generateRandomBigInteger(f);
+        } while(ExtEuclid.calculate(f, d).getGcd().compareTo(BigInteger.ONE) != 0);
+        c = ExtEuclid.calculate(f, d).getY();
+        c = c.signum() < 0? c.add(f.subtract(BigInteger.ONE)) : c;
+        return new BigInteger[] {N, d, c};
     }
 }

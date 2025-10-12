@@ -1,44 +1,22 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 
 import java.io.*;
 import java.math.BigInteger;
 
 public class RSACypher implements Cypher {
-    /**
-     * Заглушка для RSA-шифрования одного блока данных.
-     * @param message исходное сообщение (блок)
-     * @param e открытая экспонента
-     * @param n модуль RSA
-     * @return зашифрованное сообщение
-     */
-    private static BigInteger encrypt(BigInteger message, BigInteger e, BigInteger n) {
-        // TODO: Реализовать RSA-шифрование: c = m^e mod n
-        return message; // заглушка
+    private static BigInteger encrypt(BigInteger message, BigInteger d, BigInteger N) {
+        return PowerMod.calculate(message, d, N);
     }
 
-    /**
-     * Заглушка для RSA-дешифрования одного блока данных.
-     * @param cipher зашифрованное сообщение (блок)
-     * @param d закрытая экспонента
-     * @param n модуль RSA
-     * @return расшифрованное сообщение
-     */
-    private static BigInteger decrypt(BigInteger cipher, BigInteger d, BigInteger n) {
-        // TODO: Реализовать RSA-дешифрование: m = c^d mod n
-        return cipher; // заглушка
+    private static BigInteger decrypt(BigInteger cryptogram, BigInteger c, BigInteger N) {
+        return PowerMod.calculate(cryptogram, c, N);
     }
 
-    /**
-     * Шифрование файла алгоритмом RSA.
-     * @param n модуль RSA
-     * @param e открытая экспонента
-     * @param fileName имя исходного файла (должен находиться в resources)
-     * @return имя зашифрованного файла
-     */
-    public static String encryptFile(BigInteger n, BigInteger e, String fileName) {
-        int blockSize = (n.bitLength() - 1) / 8;
+    public static String encryptFile(BigInteger N, BigInteger d, String fileName) {
+        int blockSize = (N.bitLength() - 1) / 8;
 
         File input = new File(BASE_PATH + fileName);
         String encFileName = "enc_" + fileName;
@@ -51,14 +29,13 @@ public class RSACypher implements Cypher {
             int read;
 
             while ((read = in.read(buffer)) != -1) {
-                byte[] data = (read == blockSize) ? buffer : java.util.Arrays.copyOf(buffer, read);
-                BigInteger m = new BigInteger(1, data);
+                BigInteger m = new BigInteger(1, trimBuffer(buffer, read));
 
-                BigInteger c = encrypt(m, e, n); // заглушка RSA-шифрования
+                BigInteger c = encrypt(m, d, N);
 
                 byte[] cBytes = c.toByteArray();
 
-                out.writeInt(read); // исходная длина блока
+                out.writeInt(read);
                 out.writeInt(cBytes.length);
                 out.write(cBytes);
             }
@@ -69,13 +46,7 @@ public class RSACypher implements Cypher {
         return encFileName;
     }
 
-    /**
-     * Дешифрование файла, зашифрованного RSA.
-     * @param n модуль RSA
-     * @param d закрытая экспонента
-     * @param encFileName имя зашифрованного файла
-     */
-    public static void decryptFile(BigInteger n, BigInteger d, String encFileName) {
+    public static void decryptFile(BigInteger N, BigInteger c, String encFileName) {
         File input = new File(BASE_PATH + encFileName);
         File output = new File(BASE_PATH + "dec_" + encFileName.substring(4));
 
@@ -89,12 +60,11 @@ public class RSACypher implements Cypher {
                 byte[] cBytes = new byte[lenC];
                 in.readFully(cBytes);
 
-                BigInteger c = new BigInteger(1, cBytes);
+                BigInteger cryptogram = new BigInteger(1, cBytes);
 
-                BigInteger m = decrypt(c, d, n); // заглушка RSA-дешифрования
+                BigInteger m = decrypt(cryptogram, c, N);
                 byte[] raw = m.toByteArray();
 
-                // выравнивание по правому краю, чтобы восстановить ведущие нули
                 byte[] restored = new byte[origLen];
                 int copyStart = Math.max(0, raw.length - origLen);
                 int copyLen = Math.min(raw.length, origLen);
@@ -105,5 +75,12 @@ public class RSACypher implements Cypher {
         } catch (IOException ex) {
             throw new RuntimeException("Ошибка при дешифровании файла: " + ex.getMessage(), ex);
         }
+    }
+
+    private static byte[] trimBuffer(byte[] buffer, int length) {
+        if (length < 0 || length == buffer.length) return buffer;
+        byte[] trimmed = new byte[length];
+        System.arraycopy(buffer, 0, trimmed, 0, length);
+        return trimmed;
     }
 }
