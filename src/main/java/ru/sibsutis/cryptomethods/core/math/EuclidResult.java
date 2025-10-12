@@ -1,4 +1,4 @@
-package ru.sibsutis.cryptomethods.core;
+package ru.sibsutis.cryptomethods.core.math;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Getter
 @Setter
-public class EuclideanResult {
+public class EuclidResult {
     private BigInteger gcd;
     private BigInteger x;
     private BigInteger y;

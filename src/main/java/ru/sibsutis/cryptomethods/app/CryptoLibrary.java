@@ -1,9 +1,10 @@
 package ru.sibsutis.cryptomethods.app;
 
-import ru.sibsutis.cryptomethods.core.EuclideanResult;
-import ru.sibsutis.cryptomethods.core.ExtendedEuclidean;
-import ru.sibsutis.cryptomethods.core.FermatTest;
-import ru.sibsutis.cryptomethods.core.PowerMod;
+import ru.sibsutis.cryptomethods.core.math.EuclidResult;
+import ru.sibsutis.cryptomethods.core.math.BabyAndGiantStep;
+import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
+import ru.sibsutis.cryptomethods.core.math.FermatTest;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import ru.sibsutis.cryptomethods.algorithms.*;
 import ru.sibsutis.cryptomethods.io.*;
 
@@ -21,10 +22,11 @@ public class CryptoLibrary {
             System.out.println("5. Diffi Hellman");
             System.out.println("6. Shamir's cypher");
             System.out.println("7. El'Gamal's cypher");
+            System.out.println("8. RSA cypher");
             System.out.println("0. Exit");
             System.out.print("Select an option (0-7): ");
 
-            int choice = InputHandler.getIntInput();
+            int choice = ConsoleInput.readInt();
 
             BigInteger[] args;
             BigInteger a, x, p, result;
@@ -47,12 +49,12 @@ public class CryptoLibrary {
                 case 3:
                     args = InputHandler.handleExtendedEuclidean();
                     if (args == null) break;
-                    EuclideanResult euclideanResult = ExtendedEuclidean.calculate(args[0], args[1]);
-                    System.out.println("GCD(" + args[0] + ", " + args[1] + ") = " + euclideanResult.getGcd());
-                    System.out.println("Coefficients: x = " + euclideanResult.getX() + ", y = " + euclideanResult.getY());
+                    EuclidResult euclidResult = ExtEuclid.calculate(args[0], args[1]);
+                    System.out.println("GCD(" + args[0] + ", " + args[1] + ") = " + euclidResult.getGcd());
+                    System.out.println("Coefficients: x = " + euclidResult.getX() + ", y = " + euclidResult.getY());
 
-                    BigInteger check = args[0].multiply(euclideanResult.getX()).add(args[1].multiply(euclideanResult.getY()));
-                    System.out.println("Checking: " + args[0] + "*" + euclideanResult.getX() + " + " + args[1] + "*" + euclideanResult.getY() + " = " + check);
+                    BigInteger check = args[0].multiply(euclidResult.getX()).add(args[1].multiply(euclidResult.getY()));
+                    System.out.println("Checking: " + args[0] + "*" + euclidResult.getX() + " + " + args[1] + "*" + euclidResult.getY() + " = " + check);
                     break;
                 case 4:
                     args = InputHandler.handleBabyAndGiantStep();
@@ -64,7 +66,7 @@ public class CryptoLibrary {
                 case 5:
                     args = InputHandler.handleDiffHellman();
                     if (args == null) break;
-                    BigInteger sharedKey = DiffHellman.calculate(args[0], args[1], args[2], args[3]);
+                    BigInteger sharedKey = DiffHellmanCypher.calculate(args[0], args[1], args[2], args[3]);
                     System.out.println("result = " + sharedKey);
                     break;
                 case 6:
@@ -73,7 +75,7 @@ public class CryptoLibrary {
                     ShamirCypher.calculate(args[0], args[1], args[2], args[3], args[4]);
 
                     System.out.print("Enter filename: ");
-                    fileName = InputHandler.getStringInput();
+                    fileName = ConsoleInput.readString();
 
                     encFileName = ShamirCypher.encryptFile(fileName, args[0], args[1], args[2]);
                     System.out.println("File successfully encrypted.");
@@ -81,15 +83,27 @@ public class CryptoLibrary {
                     System.out.println("File successfully decrypted.");
                     break;
                 case 7:
-                    args = InputHandler.handleEl_Gamal();
+                    args = InputHandler.handleElGamal();
                     if (args == null) break;
 
                     System.out.print("Enter filename: ");
-                    fileName = InputHandler.getStringInput();
+                    fileName = ConsoleInput.readString();
 
                     encFileName = ElGamalCypher.encryptFile(args[0], args[1], fileName);
                     System.out.println("File successfully encrypted.");
                     ElGamalCypher.decryptFile(args[0], encFileName);
+                    System.out.println("File successfully decrypted.");
+                    break;
+                case 8:
+                    args = InputHandler.handleRSA();
+                    if (args == null) break;
+
+                    System.out.print("Enter filename: ");
+                    fileName = ConsoleInput.readString();
+
+//                    encFileName = RSACypher.encryptFile(args[0], args[1], fileName);
+                    System.out.println("File successfully encrypted.");
+//                    RSACypher.decryptFile(args[0], encFileName);
                     System.out.println("File successfully decrypted.");
                     break;
                 case 0:

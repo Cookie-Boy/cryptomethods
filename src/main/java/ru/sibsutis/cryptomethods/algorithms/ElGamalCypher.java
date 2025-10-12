@@ -1,15 +1,14 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
-import ru.sibsutis.cryptomethods.core.PowerMod;
+import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import ru.sibsutis.cryptomethods.core.Generator;
 import ru.sibsutis.cryptomethods.core.NetUser;
 
 import java.io.*;
 import java.math.BigInteger;
 
-public class ElGamalCypher {
-    private static final String BASE_PATH = "src/main/resources/";
-
+public class ElGamalCypher implements Cypher {
     private static NetUser alice;
     private static NetUser bob;
 

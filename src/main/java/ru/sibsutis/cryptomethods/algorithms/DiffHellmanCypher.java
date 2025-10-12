@@ -1,10 +1,11 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
+import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
 import ru.sibsutis.cryptomethods.core.NetUser;
 
 import java.math.BigInteger;
 
-public class DiffHellman {
+public class DiffHellmanCypher implements Cypher {
     public static BigInteger calculate(BigInteger p, BigInteger g, BigInteger xA, BigInteger xB) {
         NetUser alice = new NetUser(xA);
         NetUser bob = new NetUser(xB);

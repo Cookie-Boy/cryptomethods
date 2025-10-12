@@ -2,12 +2,12 @@ package ru.sibsutis.cryptomethods.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 
 import java.math.BigInteger;
 
 @Getter
 @Setter
-
 public class NetUser {
     private BigInteger secret;
     private BigInteger sharedKey;

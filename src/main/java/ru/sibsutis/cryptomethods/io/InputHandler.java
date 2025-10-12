@@ -1,14 +1,16 @@
 package ru.sibsutis.cryptomethods.io;
 
-import ru.sibsutis.cryptomethods.core.ExtendedEuclidean;
-import ru.sibsutis.cryptomethods.core.FermatTest;
-import ru.sibsutis.cryptomethods.core.PowerMod;
+import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
+import ru.sibsutis.cryptomethods.core.math.FermatTest;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 
 import java.math.BigInteger;
 import java.util.Scanner;
 
 import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
 import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readBigInt;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readInt;
 
 public class InputHandler {
     private static final Scanner scanner = new Scanner(System.in);
@@ -19,17 +21,17 @@ public class InputHandler {
         System.out.println("2. Generate parameters");
         System.out.print("Select an option (1-2): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger a, x, p;
         switch (choice) {
             case 1:
                 System.out.print("Enter base (a): ");
-                a = getBigIntegerInput();
+                a = readBigInt();
                 System.out.print("Enter degree (x): ");
-                x = getBigIntegerInput();
+                x = readBigInt();
                 System.out.print("Enter modulus (p): ");
-                p = getBigIntegerInput();
+                p = readBigInt();
                 break;
             case 2:
                 a = generateRandomBigInteger();
@@ -54,19 +56,19 @@ public class InputHandler {
         System.out.println("2. Generate a prime number");
         System.out.print("Select an option (1-2): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger number, k;
         switch (choice) {
             case 1:
                 System.out.print("Enter a number to check: ");
-                number = getBigIntegerInput();
+                number = readBigInt();
                 System.out.print("Enter test quantity (k): ");
-                k = getBigIntegerInput();
+                k = readBigInt();
                 break;
             case 2:
                 System.out.print("Enter test quantity (k): ");
-                k = getBigIntegerInput();
+                k = readBigInt();
                 number = generatePrimeNumber(k);
                 System.out.println("Generated prime number: " + number);
                 System.out.println("Bit length: " + number.bitLength() + " bits");
@@ -86,16 +88,16 @@ public class InputHandler {
         System.out.println("3. Generate prime numbers a and b");
         System.out.print("Select an option (1-3): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger a, b;
         int k;
         switch (choice) {
             case 1:
                 System.out.print("Enter number a: ");
-                a = getBigIntegerInput();
+                a = readBigInt();
                 System.out.print("Enter number b: ");
-                b = getBigIntegerInput();
+                b = readBigInt();
                 break;
             case 2:
                 a = generateRandomBigInteger();
@@ -106,7 +108,7 @@ public class InputHandler {
                 break;
             case 3:
                 System.out.print("Enter test quantity (k): ");
-                k = getIntInput();
+                k = readInt();
                 a = generatePrimeNumber(k);
                 b = generatePrimeNumber(k);
                 System.out.println("Generated prime numbers:");
@@ -128,17 +130,17 @@ public class InputHandler {
         System.out.println("3. Special");
         System.out.print("Select an option (1-3): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger a, p, y, x = null;
         switch (choice) {
             case 1:
                 System.out.print("Enter number a: ");
-                a = getBigIntegerInput();
+                a = readBigInt();
                 System.out.print("Enter number p: ");
-                p = getBigIntegerInput();
+                p = readBigInt();
                 System.out.print("Enter number y: ");
-                y = getBigIntegerInput();
+                y = readBigInt();
                 System.out.println("You entered:");
                 break;
             case 2:
@@ -169,19 +171,19 @@ public class InputHandler {
         System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
         System.out.print("Select an option (1-2): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger q, p, g, xA, xB;
         switch (choice) {
             case 1:
                 System.out.print("Enter number p: ");
-                p = getBigIntegerInput();
+                p = readBigInt();
                 System.out.print("Enter number g: ");
-                g = getBigIntegerInput();
+                g = readBigInt();
                 System.out.print("Enter number Xa: ");
-                xA = getBigIntegerInput();
+                xA = readBigInt();
                 System.out.print("Enter number Xb: ");
-                xB = getBigIntegerInput();
+                xB = readBigInt();
                 System.out.println("You entered:");
                 break;
             case 2:
@@ -213,24 +215,24 @@ public class InputHandler {
         System.out.println("2. Generate numbers 'P', 'Ca', 'Cb'");
         System.out.print("Select an option (1-2): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger p, cA, cB, dA, dB;
         switch (choice) {
             case 1:
                 System.out.print("Enter number p: ");
                 do {
-                    p = getBigIntegerInput();
+                    p = readBigInt();
                 } while(!FermatTest.check(p, 100));
                 do {
                     System.out.print("Enter number Ca: ");
-                    cA = getBigIntegerInput();
-                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA)
+                    cA = readBigInt();
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA)
                         .getGcd().compareTo(BigInteger.ONE) != 0);
                 do {
                     System.out.print("Enter number Cb: ");
-                    cB = getBigIntegerInput();
-                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB)
+                    cB = readBigInt();
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB)
                         .getGcd().compareTo(BigInteger.ONE) != 0);
                 System.out.println("You entered:");
                 break;
@@ -238,12 +240,12 @@ public class InputHandler {
                 p = generatePrimeNumber(100);
                 do {
                     cA = generateRandomBigInteger(new BigInteger("0"), p);
-                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA)
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA)
                         .getGcd().compareTo(BigInteger.ONE) != 0);
 
                 do {
                     cB = generateRandomBigInteger(new BigInteger("0"), p);
-                } while(ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB)
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB)
                         .getGcd().compareTo(BigInteger.ONE) != 0);
                 System.out.println("Generated values:");
                 break;
@@ -251,36 +253,36 @@ public class InputHandler {
                 System.out.println("Wrong choice.");
                 return null;
         }
-        dA = ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cA).getY();
-        dB = ExtendedEuclidean.calculate(p.subtract(BigInteger.ONE), cB).getY();
+        dA = ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA).getY();
+        dB = ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB).getY();
         dA = dA.signum() < 0? dA.add(p.subtract(BigInteger.ONE)) : dA;
         dB = dB.signum() < 0? dB.add(p.subtract(BigInteger.ONE)) : dB;
         System.out.println("p =" + p + " Ca = " + cA + " Cb = " + cB + " Da = " + dA + " Db = " + dB);
         return new BigInteger[] { p, cA, cB, dA, dB};
     }
 
-    public static BigInteger[] handleEl_Gamal() {
+    public static BigInteger[] handleElGamal() {
         System.out.println("\n=== El'Gamal ===");
         System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
         System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
         System.out.print("Select an option (1-2): ");
 
-        int choice = getIntInput();
+        int choice = readInt();
 
         BigInteger q, p, g, xA, xB;
         switch (choice) {
             case 1:
                 System.out.print("Enter number p: ");
-                p = getBigIntegerInput();
+                p = readBigInt();
                 System.out.print("Enter number g: ");
-                g = getBigIntegerInput();
+                g = readBigInt();
                 do {
                     System.out.print("Enter number Xa: ");
-                    xA = getBigIntegerInput();
+                    xA = readBigInt();
                 } while(xA.compareTo(p) > 0);
                 do {
                     System.out.print("Enter number Xb: ");
-                    xB = getBigIntegerInput();
+                    xB = readBigInt();
                 } while(xB.compareTo(p) > 0);
                 System.out.println("You entered:");
                 break;
@@ -308,35 +310,52 @@ public class InputHandler {
         return new BigInteger[] { p, g, xA, xB };
     }
 
-    private static BigInteger getBigIntegerInput() {
-        while (true) {
-            try {
-                System.out.print("Enter number: ");
-                String input = scanner.nextLine();
-                return new BigInteger(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Error: Please enter a valid integer");
-            }
-        }
-    }
+    public static BigInteger[] handleRSA() {
+        System.out.println("\n=== RSA Cypher ===");
+        System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.print("Select an option (1-2): ");
 
-    public static int getIntInput() {
-        while (!scanner.hasNextInt()) {
-            System.out.print("Please enter an integer: ");
-            scanner.next();
-        }
-        int result = scanner.nextInt();
-        scanner.nextLine();
-        return result;
-    }
+        int choice = readInt();
 
-    public static String getStringInput() {
-        while (!scanner.hasNext()) {
-            System.out.print("Please enter an string: ");
-            scanner.next();
+        BigInteger q, p, g, xA, xB;
+        switch (choice) {
+            case 1:
+                System.out.print("Enter number p: ");
+                p = readBigInt();
+                System.out.print("Enter number g: ");
+                g = readBigInt();
+                do {
+                    System.out.print("Enter number Xa: ");
+                    xA = readBigInt();
+                } while(xA.compareTo(p) > 0);
+                do {
+                    System.out.print("Enter number Xb: ");
+                    xB = readBigInt();
+                } while(xB.compareTo(p) > 0);
+                System.out.println("You entered:");
+                break;
+            case 2:
+                do {
+                    q = generatePrimeNumber(50);
+                    p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
+                } while (!FermatTest.check(p, 50));
+
+                for (g = BigInteger.TWO; g.compareTo(p.subtract(BigInteger.ONE)) < 0; g = g.add(BigInteger.ONE)) {
+                    if (PowerMod.calculate(g, q, p).compareTo(BigInteger.ONE) != 0) {
+                        break;
+                    }
+                }
+                xA = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                xB = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                System.out.println("Generated values:");
+                System.out.println("p = " + p + ", g = " + g + ", Xa = " + xA + ", Xb = " + xB);
+                break;
+            default:
+                System.out.println("Wrong choice.");
+                return null;
         }
-        String result = scanner.next();
-        scanner.nextLine();
-        return result;
+
+        return new BigInteger[] { p, g, xA, xB }; // !
     }
 }

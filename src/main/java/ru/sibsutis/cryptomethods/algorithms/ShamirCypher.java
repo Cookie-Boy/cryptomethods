@@ -1,15 +1,13 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
-import ru.sibsutis.cryptomethods.core.PowerMod;
+import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import ru.sibsutis.cryptomethods.core.Generator;
 
 import java.io.*;
 import java.math.BigInteger;
 
-public class ShamirCypher {
-
-    private static final String BASE_PATH = "src/main/resources/";
-
+public class ShamirCypher implements Cypher {
     public static String encryptFile(String fileName, BigInteger p, BigInteger cA, BigInteger cB) {
         File input = new File(BASE_PATH + fileName);
         String encFileName = "enc_" + fileName;

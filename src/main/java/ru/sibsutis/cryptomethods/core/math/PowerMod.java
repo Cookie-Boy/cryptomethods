@@ -1,4 +1,4 @@
-package ru.sibsutis.cryptomethods.core;
+package ru.sibsutis.cryptomethods.core.math;
 
 import java.math.BigInteger;
 

@@ -1,5 +1,7 @@
 package ru.sibsutis.cryptomethods.core;
 
+import ru.sibsutis.cryptomethods.core.math.FermatTest;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -27,7 +29,7 @@ public class Generator {
         BigInteger candidate;
 
         do {
-            candidate = new BigInteger(BIT_LENGTH, FermatTest.random).mod(max.subtract(min)).add(min);
+            candidate = new BigInteger(BIT_LENGTH, random).mod(max.subtract(min)).add(min);
             if (!candidate.testBit(0)) {
                 candidate = candidate.setBit(0);
             }
@@ -44,7 +46,7 @@ public class Generator {
         BigInteger candidate;
 
         do {
-            candidate = new BigInteger(BIT_LENGTH, FermatTest.random).mod(BigInteger.valueOf((long) 1e10));
+            candidate = new BigInteger(BIT_LENGTH, random).mod(BigInteger.valueOf((long) 1e10));
             if (!candidate.testBit(0)) {
                 candidate = candidate.setBit(0);
             }
