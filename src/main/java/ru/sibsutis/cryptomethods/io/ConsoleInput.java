@@ -6,6 +6,11 @@ import java.util.Scanner;
 public class ConsoleInput {
     private static final Scanner scanner = new Scanner(System.in);
 
+    public static BigInteger readBigInt(String message) {
+        System.out.print(message + ": ");
+        return readBigInt();
+    }
+
     public static BigInteger readBigInt() {
         while (true) {
             try {
@@ -18,6 +23,11 @@ public class ConsoleInput {
         }
     }
 
+    public static int readInt(String message) {
+        System.out.print(message + ": ");
+        return readInt();
+    }
+
     public static int readInt() {
         while (!scanner.hasNextInt()) {
             System.out.print("Please enter an integer: ");
@@ -26,6 +36,11 @@ public class ConsoleInput {
         int result = scanner.nextInt();
         scanner.nextLine();
         return result;
+    }
+
+    public static String readString(String message) {
+        System.out.print(message + ": ");
+        return readString();
     }
 
     public static String readString() {

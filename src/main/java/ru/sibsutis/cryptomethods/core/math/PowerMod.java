@@ -2,7 +2,44 @@ package ru.sibsutis.cryptomethods.core.math;
 
 import java.math.BigInteger;
 
+import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
+import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readBigInt;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readInt;
+
 public class PowerMod {
+    public static BigInteger[] handle() {
+        System.out.println("\n=== FAST EXPONENTIATION BY MODULO ===");
+        System.out.println("1. Enter parameters manually");
+        System.out.println("2. Generate parameters");
+        System.out.print("Select an option (1-2): ");
+
+        int choice = readInt();
+
+        BigInteger a, x, p;
+        switch (choice) {
+            case 1:
+                a = readBigInt("Enter base (a)");
+                x = readBigInt("Enter degree (x)");
+                p = readBigInt("Enter modulus (p)");
+                break;
+            case 2:
+                a = generateRandomBigInteger();
+                x = generateRandomBigInteger();
+                p = generatePrimeNumber(100);
+                System.out.println("Generated parameters:");
+                System.out.println("a = " + a);
+                System.out.println("x = " + x);
+                System.out.println("p = " + p);
+                break;
+            default:
+                System.out.println("Wrong choice.");
+                return null;
+        }
+
+        return new BigInteger[] { a, x, p };
+    }
+
     public static BigInteger calculate(BigInteger a, BigInteger x, BigInteger p) {
         if (p.equals(BigInteger.ONE)) return BigInteger.ZERO;
         if (x.equals(BigInteger.ZERO)) return BigInteger.ONE;

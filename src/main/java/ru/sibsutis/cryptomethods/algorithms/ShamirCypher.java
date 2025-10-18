@@ -1,14 +1,76 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
+import ru.sibsutis.cryptomethods.core.math.FermatTest;
 import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import ru.sibsutis.cryptomethods.core.Generator;
 
 import java.io.*;
 import java.math.BigInteger;
 
+import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
+import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readBigInt;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readInt;
+
 public class ShamirCypher implements Cypher {
-    public static String encryptFile(String fileName, BigInteger p, BigInteger cA, BigInteger cB) {
+    private BigInteger p;
+    private BigInteger cA;
+    private BigInteger cB;
+    private BigInteger dA;
+    private BigInteger dB;
+
+    @Override
+    public void generateKeys() {
+        System.out.println("\n=== SHAMIR ENCRYPTION ===");
+        System.out.println("1. Enter numbers 'p', 'Ca', 'Cb''");
+        System.out.println("2. Generate numbers 'P', 'Ca', 'Cb'");
+        int choice = readInt("Select an option (1-2)");
+
+        switch (choice) {
+            case 1:
+                System.out.print("Enter number p: ");
+                do {
+                    p = readBigInt();
+                } while(!FermatTest.check(p, 100));
+                do {
+                    System.out.print("Enter number Ca: ");
+                    cA = readBigInt();
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                do {
+                    System.out.print("Enter number Cb: ");
+                    cB = readBigInt();
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                System.out.println("You entered:");
+                break;
+            case 2:
+                p = generatePrimeNumber(100);
+                do {
+                    cA = generateRandomBigInteger(new BigInteger("0"), p);
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+
+                do {
+                    cB = generateRandomBigInteger(new BigInteger("0"), p);
+                } while(ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB)
+                        .getGcd().compareTo(BigInteger.ONE) != 0);
+                System.out.println("Generated values:");
+                break;
+            default:
+                System.out.println("Wrong choice.");
+        }
+        dA = ExtEuclid.calculate(p.subtract(BigInteger.ONE), cA).getY();
+        dB = ExtEuclid.calculate(p.subtract(BigInteger.ONE), cB).getY();
+        dA = dA.signum() < 0? dA.add(p.subtract(BigInteger.ONE)) : dA;
+        dB = dB.signum() < 0? dB.add(p.subtract(BigInteger.ONE)) : dB;
+        System.out.println("p =" + p + " Ca = " + cA + " Cb = " + cB + " Da = " + dA + " Db = " + dB);
+    }
+
+    @Override
+    public String encryptFile(String fileName) {
         File input = new File(BASE_PATH + fileName);
         String encFileName = "enc_" + fileName;
         File output = new File(BASE_PATH + encFileName);
@@ -38,7 +100,8 @@ public class ShamirCypher implements Cypher {
         return encFileName;
     }
 
-    public static void decryptFile(String encFileName, BigInteger p, BigInteger dA, BigInteger dB) {
+    @Override
+    public void decryptFile(String encFileName) {
         File input = new File(BASE_PATH + encFileName);
         File output = new File(BASE_PATH + "dec_" + encFileName.substring(4));
 
@@ -70,7 +133,7 @@ public class ShamirCypher implements Cypher {
         }
     }
 
-    public static void calculate(BigInteger p, BigInteger cA, BigInteger cB, BigInteger dA, BigInteger dB) {
+    public void calculate() {
         BigInteger message = Generator.generateRandomBigInteger(new BigInteger("0"), p);
         System.out.println("Message is " + message);
         BigInteger message_1 = PowerMod.calculate(message, cA, p);    // Alisa zashifrovele

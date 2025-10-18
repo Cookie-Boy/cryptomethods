@@ -1,6 +1,7 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.math.FermatTest;
 import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import ru.sibsutis.cryptomethods.core.Generator;
 import ru.sibsutis.cryptomethods.core.NetUser;
@@ -8,22 +9,76 @@ import ru.sibsutis.cryptomethods.core.NetUser;
 import java.io.*;
 import java.math.BigInteger;
 
+import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
+import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readBigInt;
+import static ru.sibsutis.cryptomethods.io.ConsoleInput.readInt;
+
 public class ElGamalCypher implements Cypher {
     private static NetUser alice;
     private static NetUser bob;
 
-    public static BigInteger[] encrypt(BigInteger p, BigInteger g, BigInteger k, BigInteger bY, BigInteger message) {
+    private BigInteger p, g, xA, xB;
+
+    @Override
+    public void generateKeys() {
+        System.out.println("\n=== El'Gamal ===");
+        System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
+        int choice = readInt("Select an option (1-2)");
+
+        BigInteger q;
+        switch (choice) {
+            case 1:
+                System.out.print("Enter number p: ");
+                p = readBigInt();
+                System.out.print("Enter number g: ");
+                g = readBigInt();
+                do {
+                    System.out.print("Enter number Xa: ");
+                    xA = readBigInt();
+                } while(xA.compareTo(p) > 0);
+                do {
+                    System.out.print("Enter number Xb: ");
+                    xB = readBigInt();
+                } while(xB.compareTo(p) > 0);
+                System.out.println("You entered:");
+                break;
+            case 2:
+                do {
+                    q = generatePrimeNumber(50);
+                    p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
+                } while (!FermatTest.check(p, 50));
+
+                for (g = BigInteger.TWO; g.compareTo(p.subtract(BigInteger.ONE)) < 0; g = g.add(BigInteger.ONE)) {
+                    if (PowerMod.calculate(g, q, p).compareTo(BigInteger.ONE) != 0) {
+                        break;
+                    }
+                }
+
+                xA = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                xB = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                System.out.println("Generated values:");
+                System.out.println("p = " + p + ", g = " + g + ", Xa = " + xA + ", Xb = " + xB);
+                break;
+            default:
+                System.out.println("Wrong choice.");
+        }
+    }
+
+    public BigInteger[] encrypt(BigInteger p, BigInteger g, BigInteger k, BigInteger bY, BigInteger message) {
         BigInteger[] pair = new BigInteger[2];
         pair[0] = PowerMod.calculate(g, k, p);
         pair[1] = PowerMod.calculate(bY, k, p).multiply(message).mod(p);
         return pair;
     }
 
-    public static BigInteger decrypt(BigInteger p, BigInteger power, BigInteger[] pair) {
+    public BigInteger decrypt(BigInteger p, BigInteger power, BigInteger[] pair) {
         return PowerMod.calculate(pair[0], power, p).multiply(pair[1]).mod(p);
     }
 
-    public static String encryptFile(BigInteger p, BigInteger g, String fileName) {
+    @Override
+    public String encryptFile(String fileName) {
         alice = new NetUser(Generator.generateRandomBigInteger(BigInteger.ZERO, p));
         bob = new NetUser(Generator.generateRandomBigInteger(BigInteger.ZERO, p));
         int blockSize = (p.bitLength() - 1) / 8;
@@ -60,7 +115,8 @@ public class ElGamalCypher implements Cypher {
         return encFileName;
     }
 
-    public static void decryptFile(BigInteger p, String encFileName) {
+    @Override
+    public void decryptFile(String encFileName) {
         File input = new File(BASE_PATH + encFileName);
         File output = new File(BASE_PATH + "dec_" + encFileName.substring(4));
 
@@ -84,7 +140,6 @@ public class ElGamalCypher implements Cypher {
                 BigInteger m = decrypt(p, p.subtract(BigInteger.ONE).subtract(bob.getSecret()), new BigInteger[]{a, b});
                 byte[] raw = m.toByteArray();
 
-                // выравниваем байты по правому краю, чтобы восстановить ведущие нули
                 byte[] restored = new byte[origLen];
                 int copyStart = Math.max(0, raw.length - origLen);
                 int copyLen = Math.min(raw.length, origLen);
