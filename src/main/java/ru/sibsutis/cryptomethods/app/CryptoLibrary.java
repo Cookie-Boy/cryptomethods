@@ -23,7 +23,7 @@ public class CryptoLibrary {
     public static void start() {
         while (true) {
             ConsoleMenu.showMain();
-            int choice = ConsoleInput.readInt("Select an option (0-8)");
+            int choice = ConsoleInput.readInt("Select an option (0-9)");
             if (choice == 0) break;
 
             switch (choice) {
