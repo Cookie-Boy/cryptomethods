@@ -11,6 +11,7 @@ public class ConsoleMenu {
         System.out.println("6. Shamir's cypher");
         System.out.println("7. El'Gamal's cypher");
         System.out.println("8. RSA cypher");
+        System.out.println("9. Vernam cypher");
         System.out.println("0. Exit");
     }
 }

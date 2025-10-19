@@ -1,9 +1,6 @@
 package ru.sibsutis.cryptomethods.app;
 
-import ru.sibsutis.cryptomethods.algorithms.DiffHellmanCypher;
-import ru.sibsutis.cryptomethods.algorithms.ElGamalCypher;
-import ru.sibsutis.cryptomethods.algorithms.RSACypher;
-import ru.sibsutis.cryptomethods.algorithms.ShamirCypher;
+import ru.sibsutis.cryptomethods.algorithms.*;
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
 import ru.sibsutis.cryptomethods.core.math.*;
 import ru.sibsutis.cryptomethods.io.*;
@@ -20,6 +17,7 @@ public class CryptoLibrary {
         actions.put(6, new ShamirCypher());
         actions.put(7, new ElGamalCypher());
         actions.put(8, new RSACypher());
+        actions.put(9, new VernamCypher());
     }
 
     public static void start() {
