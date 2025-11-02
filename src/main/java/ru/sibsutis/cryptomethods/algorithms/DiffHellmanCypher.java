@@ -60,9 +60,9 @@ public class DiffHellmanCypher {
         yB = bob.createPublicKey(g, p);
         alice.createSharedKey(yB, p);
         bob.createSharedKey(yA, p);
-        System.out.println("p = " + p + " g = " + g + " Xa = " + xA + " Xb = " + xB + " Alice's open key = " + yA + " Bob's open key = " + yB);
-        System.out.println("Shared keys are: Alice = " + alice.getSharedKey() + " Bob = " + bob.getSharedKey());
-        System.out.println("As we can see, both are equal to each other. Sooo, yeah, we are cool as hell");
+//        System.out.println("p = " + p + " g = " + g + " Xa = " + xA + " Xb = " + xB + " Alice's open key = " + yA + " Bob's open key = " + yB);
+//        System.out.println("Shared keys are: Alice = " + alice.getSharedKey() + " Bob = " + bob.getSharedKey());
+//        System.out.println("As we can see, both are equal to each other. Sooo, yeah, we are cool as hell");
         return alice.getSharedKey();
     }
 }
