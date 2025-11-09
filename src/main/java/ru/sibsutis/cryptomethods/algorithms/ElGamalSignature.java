@@ -1,9 +1,12 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
-import ru.sibsutis.cryptomethods.core.Generator;
+import ru.sibsutis.cryptomethods.core.math.EuclidResult;
+import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
 import ru.sibsutis.cryptomethods.core.math.FermatTest;
 import ru.sibsutis.cryptomethods.core.math.PowerMod;
+import ru.sibsutis.cryptomethods.core.Generator;
+import ru.sibsutis.cryptomethods.core.NetUser;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -11,22 +14,24 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
+import static ru.sibsutis.cryptomethods.core.Generator.generateRandomBigInteger;
 import static ru.sibsutis.cryptomethods.io.ConsoleInput.readBigInt;
 import static ru.sibsutis.cryptomethods.io.ConsoleInput.readInt;
 
 public class ElGamalSignature implements Cypher {
-    private BigInteger p;
-    private BigInteger g;
-    private BigInteger x;
-    private BigInteger y;
+    private static NetUser alice;
+    private static NetUser bob;
+
+    private BigInteger p, g, xA, xB;
 
     @Override
     public void generateKeys() {
-        System.out.println("\n=== El'Gamal Signature ===");
-        System.out.println("1. Enter numbers 'p', 'g', 'x'");
-        System.out.println("2. Generate numbers 'p', 'g', 'x'");
+        System.out.println("\n=== El'Gamal ===");
+        System.out.println("1. Enter numbers 'p', 'g', 'Xa', 'Xb'");
+        System.out.println("2. Generate numbers 'p', 'g', 'Xa', 'Xb'");
         int choice = readInt("Select an option (1-2)");
 
+        BigInteger q;
         switch (choice) {
             case 1:
                 System.out.print("Enter number p: ");
@@ -34,12 +39,16 @@ public class ElGamalSignature implements Cypher {
                 System.out.print("Enter number g: ");
                 g = readBigInt();
                 do {
-                    System.out.print("Enter private x: ");
-                    x = readBigInt();
-                } while (x.compareTo(BigInteger.ONE) < 0 || x.compareTo(p.subtract(BigInteger.ONE)) >= 0);
+                    System.out.print("Enter number Xa: ");
+                    xA = readBigInt();
+                } while(xA.compareTo(p) > 0);
+                do {
+                    System.out.print("Enter number Xb: ");
+                    xB = readBigInt();
+                } while(xB.compareTo(p) > 0);
+                System.out.println("You entered:");
                 break;
             case 2:
-                BigInteger q;
                 do {
                     q = generatePrimeNumber(50);
                     p = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
@@ -50,54 +59,55 @@ public class ElGamalSignature implements Cypher {
                         break;
                     }
                 }
-                x = Generator.generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+
+                xA = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
+                xB = generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
                 System.out.println("Generated values:");
-                System.out.println("p = " + p + ", g = " + g + ", x = " + x);
+                System.out.println("p = " + p + ", g = " + g + ", Xa = " + xA + ", Xb = " + xB);
                 break;
             default:
                 System.out.println("Wrong choice.");
-                return;
         }
+    }
 
-        y = PowerMod.calculate(g, x, p); // public key
-        System.out.println("Public key: p=" + p + ", g=" + g + ", y=" + y);
+    public BigInteger[] encrypt(BigInteger p, BigInteger g, BigInteger k, BigInteger bY, BigInteger message) {
+        BigInteger[] pair = new BigInteger[2];
+        pair[0] = PowerMod.calculate(g, k, p);
+        pair[1] = PowerMod.calculate(bY, k, p).multiply(message).mod(p);
+        return pair;
+    }
+
+    public BigInteger decrypt(BigInteger p, BigInteger power, BigInteger[] pair) {
+        return PowerMod.calculate(pair[0], power, p).multiply(pair[1]).mod(p);
     }
 
     @Override
     public String encryptFile(String fileName) {
+        alice = new NetUser(Generator.generateRandomBigInteger(BigInteger.ZERO, p));
+        bob = new NetUser(Generator.generateRandomBigInteger(BigInteger.ZERO, p));
         int blockSize = (p.bitLength() - 1) / 8;
 
         File input = new File(BASE_PATH + fileName);
         String encFileName = "enc_" + fileName;
-        String sigFileName = "sig_" + fileName;
+        String signatureFileName = "sig_" + fileName;
         File output = new File(BASE_PATH + encFileName);
 
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(output));
-             FileInputStream fis = new FileInputStream(input)) {
-
+             FileInputStream in = new FileInputStream(input)) {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-
             byte[] buffer = new byte[blockSize];
             int read;
 
-            // шифруем блоки (как в ElGamalCypher) и одновременно считаем хеш оригинального файла
-            while ((read = fis.read(buffer)) != -1) {
+            while ((read = in.read(buffer)) != -1) {
                 byte[] data = (read == blockSize) ? buffer : java.util.Arrays.copyOf(buffer, read);
+                BigInteger m = new BigInteger(1, data); // беззнаковое
                 md.update(data);
 
-                BigInteger m = new BigInteger(1, data);
+                BigInteger[] enc = encrypt(p, g, alice.getSecret(), bob.createPublicKey(g, p), m);
+                alice.setSecret(Generator.generateRandomBigInteger(p, BigInteger.valueOf(Long.MAX_VALUE)));
 
-                // выбираем случайный k для этого блока (не тот же k для подписи)
-                BigInteger k = Generator.generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
-                while (!k.gcd(p.subtract(BigInteger.ONE)).equals(BigInteger.ONE)) {
-                    k = Generator.generateRandomBigInteger(BigInteger.ONE, p.subtract(BigInteger.ONE));
-                }
-
-                BigInteger a = PowerMod.calculate(g, k, p);
-                BigInteger b = PowerMod.calculate(y, k, p).multiply(m).mod(p);
-
-                byte[] aBytes = a.toByteArray();
-                byte[] bBytes = b.toByteArray();
+                byte[] aBytes = enc[0].toByteArray();
+                byte[] bBytes = enc[1].toByteArray();
 
                 out.writeInt(read);
                 out.writeInt(aBytes.length);
@@ -105,62 +115,47 @@ public class ElGamalSignature implements Cypher {
                 out.writeInt(bBytes.length);
                 out.write(bBytes);
             }
-
-            // формируем подпись от полного хеша (SHA-256)
             byte[] hash = md.digest();
-            BigInteger h = new BigInteger(1, hash);
-            // приводим х к модулю (p-1) для подписи
-            BigInteger pm1 = p.subtract(BigInteger.ONE);
-            BigInteger hMod = h.mod(pm1);
+            BigInteger h = new BigInteger(1, hash).mod(p.subtract(BigInteger.ONE));
+            BigInteger kSig;
+            EuclidResult res;
+            BigInteger p_1 = p.subtract(BigInteger.ONE);
+            do {
+                kSig = Generator.generateRandomBigInteger(BigInteger.ONE, p_1);
+                res = ExtEuclid.calculate(p_1, kSig);
+            } while (!res.getGcd().equals(BigInteger.ONE));
+            BigInteger r = PowerMod.calculate(g, kSig, p);
+            BigInteger u = h.subtract(r.multiply(alice.getSecret())).mod(p_1);
+            BigInteger s = res.getY().multiply(u).mod(p_1);
 
-            // выбираем k для подписи: gcd(k, p-1) = 1
-            BigInteger kSig = Generator.generateRandomBigInteger(BigInteger.ONE, pm1);
-            while (!kSig.gcd(pm1).equals(BigInteger.ONE)) {
-                kSig = Generator.generateRandomBigInteger(BigInteger.ONE, pm1);
+            byte[] rb = r.toByteArray();
+            byte[] sb = s.toByteArray();
+
+            System.out.println("r = " + r + " s = " + s);
+
+            try (DataOutputStream sigOut = new DataOutputStream(new FileOutputStream(BASE_PATH + signatureFileName))) {
+                sigOut.writeInt(rb.length);
+                sigOut.write(rb);
+                sigOut.writeInt(sb.length);
+                sigOut.write(sb);
             }
 
-            BigInteger aSig = PowerMod.calculate(g, kSig, p);
-            BigInteger kInv = kSig.modInverse(pm1);
-            BigInteger bSig = kInv.multiply(hMod.subtract(x.multiply(aSig))).mod(pm1);
-            if (bSig.signum() < 0) bSig = bSig.add(pm1);
-
-            // записываем подпись в отдельный файл
-            try (DataOutputStream sigOut = new DataOutputStream(new FileOutputStream(BASE_PATH + sigFileName))) {
-                byte[] aSBytes = aSig.toByteArray();
-                byte[] bSBytes = bSig.toByteArray();
-                sigOut.writeInt(aSBytes.length);
-                sigOut.write(aSBytes);
-                sigOut.writeInt(bSBytes.length);
-                sigOut.write(bSBytes);
-            }
-
-            System.out.println("Encrypted: " + encFileName);
-            System.out.println("Signature saved in: " + sigFileName);
-            return encFileName;
-
-        } catch (IOException | NoSuchAlgorithmException ex) {
-            throw new RuntimeException("Error during encryption/signing: " + ex.getMessage(), ex);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
+        return encFileName;
     }
 
     @Override
     public void decryptFile(String encFileName) {
         File input = new File(BASE_PATH + encFileName);
-        if (!input.exists()) throw new RuntimeException("File not found: " + encFileName);
-
-        String sigFileName = "sig_" + encFileName.replaceFirst("^enc_", "");
-        File sigFile = new File(BASE_PATH + sigFileName);
-        if (!sigFile.exists()) throw new RuntimeException("Signature file not found: " + sigFileName);
-
         File output = new File(BASE_PATH + "dec_" + encFileName.substring(4));
+        String sigFileName = "sig_" + encFileName.replace("enc_", "");
+        File sigFile = new File(BASE_PATH + sigFileName);
 
         try (DataInputStream in = new DataInputStream(new FileInputStream(input));
-             FileOutputStream out = new FileOutputStream(output);
-             DataInputStream sigIn = new DataInputStream(new FileInputStream(sigFile))) {
-
+             FileOutputStream out = new FileOutputStream(output)) {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-
-            // Дешифрование: читаем блоки, восстанавливаем m и пишем в output, одновременно считаем хеш расшифрованного
             while (in.available() > 0) {
                 int origLen = in.readInt();
 
@@ -175,11 +170,7 @@ public class ElGamalSignature implements Cypher {
                 BigInteger a = new BigInteger(1, aBytes);
                 BigInteger b = new BigInteger(1, bBytes);
 
-                // m = b * a^{p-1-x} mod p
-                BigInteger power = p.subtract(BigInteger.ONE).subtract(x);
-                BigInteger aPow = PowerMod.calculate(a, power, p);
-                BigInteger m = b.multiply(aPow).mod(p);
-
+                BigInteger m = decrypt(p, p.subtract(BigInteger.ONE).subtract(bob.getSecret()), new BigInteger[]{a, b});
                 byte[] raw = m.toByteArray();
 
                 byte[] restored = new byte[origLen];
@@ -191,35 +182,31 @@ public class ElGamalSignature implements Cypher {
                 md.update(restored);
             }
 
-            // вычисляем хеш от расшифрованных данных
             byte[] hash = md.digest();
-            BigInteger h = new BigInteger(1, hash);
-            BigInteger pm1 = p.subtract(BigInteger.ONE);
-            BigInteger hMod = h.mod(pm1);
+            BigInteger h = new BigInteger(1, hash).mod(p.subtract(BigInteger.ONE));
+            BigInteger r, s;
 
-            // читаем подпись (aSig, bSig) из sigFile
-            int aLen = sigIn.readInt();
-            byte[] aSigBytes = new byte[aLen];
-            sigIn.readFully(aSigBytes);
-            int bLen = sigIn.readInt();
-            byte[] bSigBytes = new byte[bLen];
-            sigIn.readFully(bSigBytes);
-
-            BigInteger aSig = new BigInteger(1, aSigBytes);
-            BigInteger bSig = new BigInteger(1, bSigBytes);
-
-            // проверка: g^h ≡ y^a * a^b (mod p)
-            BigInteger left = PowerMod.calculate(g, hMod, p);
-            BigInteger right = PowerMod.calculate(y, aSig, p).multiply(PowerMod.calculate(aSig, bSig, p)).mod(p);
-
-            if (left.equals(right)) {
-                System.out.println("Signature is correct. Decrypted file: " + output.getName());
-            } else {
-                System.out.println("Signature is NOT correct! Decrypted file: " + output.getName());
+            try (DataInputStream sigIn = new DataInputStream(new FileInputStream(sigFile))) {
+                int rb = sigIn.readInt();
+                r = new BigInteger(1, sigIn.readNBytes(rb));
+                int sb = sigIn.readInt();
+                s = new BigInteger(1, sigIn.readNBytes(sb));
             }
 
-        } catch (IOException | NoSuchAlgorithmException ex) {
-            throw new RuntimeException("Error during decrypting/verification: " + ex.getMessage(), ex);
+            BigInteger Yr = PowerMod.calculate(alice.createPublicKey(g, p), r, p);
+            BigInteger Rs = PowerMod.calculate(r, s, p);
+            BigInteger Ghp = PowerMod.calculate(g, h, p);
+            BigInteger leftPart = Yr.multiply(Rs).mod(p);
+
+            if(Ghp.compareTo(leftPart) == 0) {
+                System.out.println("Sign is correct!");
+            } else {
+                System.out.println("Sign IS NOT correct!");
+            }
+
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
+
 }
