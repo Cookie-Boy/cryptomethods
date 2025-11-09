@@ -19,12 +19,13 @@ public class CryptoLibrary {
         actions.put(8, new RSACypher());
         actions.put(9, new VernamCypher());
         actions.put(10, new RSASignature());
+        actions.put(11, new ElGamalSignature());
     }
 
     public static void start() {
         while (true) {
             ConsoleMenu.showMain();
-            int choice = ConsoleInput.readInt("Select an option (0-10)");
+            int choice = ConsoleInput.readInt("Select an option (0-11)");
             if (choice == 0) break;
 
             switch (choice) {
