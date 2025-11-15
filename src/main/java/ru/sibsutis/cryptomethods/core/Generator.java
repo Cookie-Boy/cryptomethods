@@ -54,4 +54,22 @@ public class Generator {
 
         return candidate;
     }
+
+    public static BigInteger generatePrimeWithBitLength(int bitLength) {
+        if (bitLength < 2) {
+            throw new IllegalArgumentException("Bit length must be at least 2");
+        }
+
+        BigInteger prime;
+        int certainty = 100;
+
+        do {
+            prime = new BigInteger(bitLength, random);
+            prime = prime.setBit(bitLength - 1);
+            prime = prime.setBit(0); // устанавливаем младший бит в 1
+
+        } while (!prime.isProbablePrime(certainty));
+
+        return prime;
+    }
 }

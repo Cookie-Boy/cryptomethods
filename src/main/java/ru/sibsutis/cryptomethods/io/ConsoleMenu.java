@@ -14,6 +14,7 @@ public class ConsoleMenu {
         System.out.println("9. Vernam cypher");
         System.out.println("10. RSA signature");
         System.out.println("11. El'Gamal's signature");
+        System.out.println("12. GOST signature");
         System.out.println("0. Exit");
     }
 }

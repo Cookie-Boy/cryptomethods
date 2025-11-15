@@ -198,7 +198,7 @@ public class ElGamalSignature implements Cypher {
             BigInteger Ghp = PowerMod.calculate(g, h, p);
             BigInteger leftPart = Yr.multiply(Rs).mod(p);
 
-            if(Ghp.compareTo(leftPart) == 0) {
+            if (Ghp.compareTo(leftPart) == 0) {
                 System.out.println("Sign is correct!");
             } else {
                 System.out.println("Sign IS NOT correct!");
