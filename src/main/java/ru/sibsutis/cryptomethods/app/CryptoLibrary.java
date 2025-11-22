@@ -21,12 +21,13 @@ public class CryptoLibrary {
         actions.put(10, new RSASignature());
         actions.put(11, new ElGamalSignature());
         actions.put(12, new GOSTSignature());
+        actions.put(13, new FIPSSignature());
     }
 
     public static void start() {
         while (true) {
             ConsoleMenu.showMain();
-            int choice = ConsoleInput.readInt("Select an option (0-12)");
+            int choice = ConsoleInput.readInt("Select an option (0-13)");
             if (choice == 0) break;
 
             switch (choice) {
