@@ -27,7 +27,7 @@ public class CryptoLibrary {
     public static void start() {
         while (true) {
             ConsoleMenu.showMain();
-            int choice = ConsoleInput.readInt("Select an option (0-13)");
+            int choice = ConsoleInput.readInt("Select an option (0-14)");
             if (choice == 0) break;
 
             switch (choice) {
@@ -37,6 +37,7 @@ public class CryptoLibrary {
                 case 4 -> runBabyAndGiantStep();
                 case 5 -> runDiffHellmanCypher();
                 default -> runCypher(actions.get(choice));
+                case 14 -> runCryptoPoker();
             }
         }
     }
@@ -87,5 +88,11 @@ public class CryptoLibrary {
         String fileName = ConsoleInput.readString("Enter filename");
         String encFileName = cypher.encryptFile(fileName);
         cypher.decryptFile(encFileName);
+    }
+
+    private static void runCryptoPoker() {
+        CryptoPoker poker = new CryptoPoker();
+        poker.generateKeys();
+        poker.simulate();
     }
 }

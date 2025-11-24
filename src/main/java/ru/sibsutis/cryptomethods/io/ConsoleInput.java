@@ -23,6 +23,20 @@ public class ConsoleInput {
         }
     }
 
+    public static BigInteger readOptionalBigInt() {
+        while (true) {
+            try {
+                System.out.print("Enter number: ");
+                String input = scanner.nextLine().trim();
+                if(input.isEmpty())
+                    return BigInteger.ZERO;
+                return new BigInteger(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Please enter a valid integer");
+            }
+        }
+    }
+
     public static int readInt(String message) {
         System.out.print(message + ": ");
         return readInt();
