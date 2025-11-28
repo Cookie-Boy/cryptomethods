@@ -10,12 +10,12 @@ import java.util.List;
 
 import static ru.sibsutis.cryptomethods.core.Generator.generatePrimeNumber;
 
-public class Gamer {
+public class Gambler {
     private BigInteger secret;
     private BigInteger antisecret;
     private List<BigInteger> hand;
 
-    public Gamer(BigInteger p) {
+    public Gambler(BigInteger p) {
         EuclidResult res;
         do {
             secret = generatePrimeNumber(100, BigInteger.valueOf(2), p.subtract(BigInteger.TWO));
@@ -49,6 +49,6 @@ public class Gamer {
 
     public void show() {
         for(int i = 0; i < hand.size(); i++)
-            System.out.println("        " + i + " - " + hand.get(i));
+            System.out.println("        " + (i + 1) + " - " + hand.get(i));
     }
 }
