@@ -36,8 +36,8 @@ public class CryptoLibrary {
                 case 3 -> runExtEuclid();
                 case 4 -> runBabyAndGiantStep();
                 case 5 -> runDiffHellmanCypher();
-                default -> runCypher(actions.get(choice));
                 case 14 -> runCryptoPoker();
+                default -> runCypher(actions.get(choice));
             }
         }
     }
@@ -91,8 +91,6 @@ public class CryptoLibrary {
     }
 
     private static void runCryptoPoker() {
-        CryptoPoker poker = new CryptoPoker();
-        poker.generateKeys();
-        poker.simulate();
+        CryptoPokerUI.runPoker();
     }
 }
