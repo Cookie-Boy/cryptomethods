@@ -10,19 +10,18 @@ import java.util.Random;
 public class BlindVotingClient {
 
     private final BigInteger N;
-    private final BigInteger c;
+    private final BigInteger d;
 
     private BigInteger n;
     private BigInteger h;
     private BigInteger r;
     private BigInteger rInv;
 
-    public BlindVotingClient(BigInteger N, BigInteger c) {
+    public BlindVotingClient(BigInteger N, BigInteger d) {
         this.N = N;
-        this.c = c;
+        this.d = d;
     }
 
-    // ==== Клиент формирует бюллетень ====
     public BigInteger generateBallot(int vote) {
         BigInteger rnd512 = new BigInteger(512, new Random());
         BigInteger v = BigInteger.valueOf(vote);
@@ -30,13 +29,11 @@ public class BlindVotingClient {
         return n;
     }
 
-    // ==== Хэширование n ====
     public BigInteger computeHash() {
         h = sha3(n.toString());
         return h;
     }
 
-    // ==== Ослепление ====
     public BigInteger blind() {
         Random random = new Random();
         do {
@@ -45,7 +42,7 @@ public class BlindVotingClient {
 
         rInv = r.modInverse(N);
 
-        return h.multiply(PowerMod.calculate(r, c, N)).mod(N);
+        return h.multiply(PowerMod.calculate(r, d, N)).mod(N);
     }
 
     public BigInteger unblind(BigInteger sBlinded) {

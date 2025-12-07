@@ -9,16 +9,20 @@ import ru.sibsutis.cryptomethods.core.math.PowerMod;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.util.*;
 
 public class BlindVotingServer implements Cypher {
 
-    private BigInteger d;
+    @Getter
+    private BigInteger d; // public
+
+    @Getter
+    private BigInteger c; // private
 
     @Getter
     private BigInteger N;
-    @Getter
-    private BigInteger c;
+
+    private final Set<String> allowedVoters = new HashSet<>();
 
     private final Random rnd = new Random();
 
@@ -32,37 +36,57 @@ public class BlindVotingServer implements Cypher {
         BigInteger f = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
         do {
-            d = Generator.generateRandomBigInteger(f);
-        } while(ExtEuclid.calculate(f, d).getGcd().compareTo(BigInteger.ONE) != 0);
-        c = ExtEuclid.calculate(f, d).getY().mod(f);
+            c = Generator.generateRandomBigInteger(f);
+        } while (!ExtEuclid.calculate(f, c).getGcd().equals(BigInteger.ONE));
+
+        d = ExtEuclid.calculate(f, c).getY().mod(f);
 
         System.out.println("p = " + p);
         System.out.println("q = " + q);
         System.out.println("N = " + N);
         System.out.println("phi = " + f);
-        System.out.println("c (public) = " + c);
-        System.out.println("d (private) = " + d);
+        System.out.println("d (public) = " + d);
+        System.out.println("c (private) = " + c);
 
         System.out.println("\nТеперь сервер готов принимать слепые подписи.\n");
     }
 
     @Override
-    public String encryptFile(String fileName) {
-        return "";
-    }
+    public String encryptFile(String fileName) { return ""; }
 
     @Override
-    public void decryptFile(String encFileName) {
+    public void decryptFile(String encFileName) { }
 
+    // ======================
+    //   Список голосующих
+    // ======================
+
+    public void addAllowedVoter(String id) {
+        allowedVoters.add(id);
     }
 
-    public BigInteger signBlinded(BigInteger blindedHash) {
-        return PowerMod.calculate(blindedHash, d, N);
+    public boolean isAllowed(String id) {
+        return allowedVoters.contains(id);
+    }
+
+    public void markVoted(String id) {
+        allowedVoters.remove(id);
+    }
+
+    public BigInteger signBlinded(BigInteger blindedHash, String voterId) {
+
+        if (!isAllowed(voterId)) {
+            throw new RuntimeException("Пользователь '" + voterId + "' не имеет право голосовать или уже голосовал!");
+        }
+
+        markVoted(voterId);
+
+        return PowerMod.calculate(blindedHash, c, N);
     }
 
     public boolean verify(BigInteger n, BigInteger signature) {
         BigInteger h = sha3(n.toString());
-        BigInteger sCheck = PowerMod.calculate(signature, c, N);
+        BigInteger sCheck = PowerMod.calculate(signature, d, N);
         return sCheck.equals(h);
     }
 
