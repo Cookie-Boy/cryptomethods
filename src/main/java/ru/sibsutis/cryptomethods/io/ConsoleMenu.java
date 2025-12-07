@@ -17,6 +17,7 @@ public class ConsoleMenu {
         System.out.println("12. GOST signature");
         System.out.println("13. FIPS signature");
         System.out.println("14. Crypto poker");
+        System.out.println("15. Blind signature");
         System.out.println("0. Exit");
     }
 }

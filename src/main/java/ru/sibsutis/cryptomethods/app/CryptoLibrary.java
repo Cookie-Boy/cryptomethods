@@ -27,7 +27,7 @@ public class CryptoLibrary {
     public static void start() {
         while (true) {
             ConsoleMenu.showMain();
-            int choice = ConsoleInput.readInt("Select an option (0-14)");
+            int choice = ConsoleInput.readInt("Select an option (0-15)");
             if (choice == 0) break;
 
             switch (choice) {
@@ -37,6 +37,7 @@ public class CryptoLibrary {
                 case 4 -> runBabyAndGiantStep();
                 case 5 -> runDiffHellmanCypher();
                 case 14 -> runCryptoPoker();
+                case 15 -> runBlindSignature();
                 default -> runCypher(actions.get(choice));
             }
         }
@@ -92,5 +93,23 @@ public class CryptoLibrary {
 
     private static void runCryptoPoker() {
         CryptoPokerUI.runPoker();
+    }
+
+    private static void runBlindSignature() {
+        BlindVotingServer server = new BlindVotingServer();
+        server.generateKeys();
+
+        BlindVotingClient client = new BlindVotingClient(server.getN(), server.getC());
+
+        BigInteger ballot = client.generateBallot(1);
+        BigInteger hash = client.computeHash();
+        BigInteger blinded = client.blind();
+
+        BigInteger blindedSignature = server.signBlinded(blinded);
+        BigInteger signature = client.unblind(blindedSignature);
+
+        boolean ok = server.verify(ballot, signature);
+
+        System.out.println("Signature is correct: " + ok);
     }
 }
