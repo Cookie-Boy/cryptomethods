@@ -1,5 +1,6 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
+import lombok.Getter;
 import ru.sibsutis.cryptomethods.core.math.PowerMod;
 
 import java.math.BigInteger;
@@ -17,7 +18,11 @@ public class BlindVotingClient {
     private BigInteger r;
     private BigInteger rInv;
 
-    public BlindVotingClient(BigInteger N, BigInteger d) {
+    @Getter
+    private String name;
+
+    public BlindVotingClient(String name, BigInteger N, BigInteger d) {
+        this.name = name;
         this.N = N;
         this.d = d;
     }

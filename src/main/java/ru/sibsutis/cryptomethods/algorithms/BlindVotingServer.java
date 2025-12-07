@@ -28,7 +28,7 @@ public class BlindVotingServer implements Cypher {
 
     @Override
     public void generateKeys() {
-        System.out.println("=== CЛЕПОЕ ГОЛОСОВАНИЕ: ГЕНЕРАЦИЯ RSA ===");
+        System.out.println("=== BLIND VOTING ===");
 
         BigInteger p = BigInteger.probablePrime(1024, rnd);
         BigInteger q = BigInteger.probablePrime(1024, rnd);
@@ -48,7 +48,7 @@ public class BlindVotingServer implements Cypher {
         System.out.println("d (public) = " + d);
         System.out.println("c (private) = " + c);
 
-        System.out.println("\nТеперь сервер готов принимать слепые подписи.\n");
+        System.out.println("\nThe server is now ready to accept blind signatures.\n");
     }
 
     @Override
@@ -57,9 +57,6 @@ public class BlindVotingServer implements Cypher {
     @Override
     public void decryptFile(String encFileName) { }
 
-    // ======================
-    //   Список голосующих
-    // ======================
 
     public void addAllowedVoter(String id) {
         allowedVoters.add(id);
@@ -76,7 +73,7 @@ public class BlindVotingServer implements Cypher {
     public BigInteger signBlinded(BigInteger blindedHash, String voterId) {
 
         if (!isAllowed(voterId)) {
-            throw new RuntimeException("Пользователь '" + voterId + "' не имеет право голосовать или уже голосовал!");
+            throw new RuntimeException("User '" + voterId + "' is not allowed to vote or has already voted!");
         }
 
         markVoted(voterId);
