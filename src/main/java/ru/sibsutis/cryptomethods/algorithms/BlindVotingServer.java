@@ -1,6 +1,10 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
+import lombok.Getter;
 import ru.sibsutis.cryptomethods.algorithms.common.Cypher;
+import ru.sibsutis.cryptomethods.core.Generator;
+import ru.sibsutis.cryptomethods.core.math.ExtEuclid;
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -9,31 +13,33 @@ import java.util.Random;
 
 public class BlindVotingServer implements Cypher {
 
-    private BigInteger p, q;
-    private BigInteger N;     // Модуль
-    private BigInteger phi;   // Функция Эйлера
-    private BigInteger d;     // Закрытый ключ
-    private BigInteger c;     // Открытый ключ
+    private BigInteger d;
+
+    @Getter
+    private BigInteger N;
+    @Getter
+    private BigInteger c;
 
     private final Random rnd = new Random();
 
-    // ==== Генерация ключей (точка входа вместо AnonymousVotingApp) ====
     @Override
     public void generateKeys() {
-        System.out.println("=== БЛИНД-ГОЛОСОВАНИЕ: ГЕНЕРАЦИЯ RSA ===");
+        System.out.println("=== CЛЕПОЕ ГОЛОСОВАНИЕ: ГЕНЕРАЦИЯ RSA ===");
 
-        p = BigInteger.probablePrime(512, rnd);
-        q = BigInteger.probablePrime(512, rnd);
+        BigInteger p = BigInteger.probablePrime(1024, rnd);
+        BigInteger q = BigInteger.probablePrime(1024, rnd);
         N = p.multiply(q);
-        phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+        BigInteger f = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
-        c = BigInteger.valueOf(65537);
-        d = c.modInverse(phi);
+        do {
+            d = Generator.generateRandomBigInteger(f);
+        } while(ExtEuclid.calculate(f, d).getGcd().compareTo(BigInteger.ONE) != 0);
+        c = ExtEuclid.calculate(f, d).getY().mod(f);
 
         System.out.println("p = " + p);
         System.out.println("q = " + q);
         System.out.println("N = " + N);
-        System.out.println("phi = " + phi);
+        System.out.println("phi = " + f);
         System.out.println("c (public) = " + c);
         System.out.println("d (private) = " + d);
 
@@ -50,20 +56,15 @@ public class BlindVotingServer implements Cypher {
 
     }
 
-    // ==== Подписать ослеплённый хэш ====
     public BigInteger signBlinded(BigInteger blindedHash) {
-        return blindedHash.modPow(c, N);
+        return PowerMod.calculate(blindedHash, d, N);
     }
 
-    // ==== Проверить итоговый бюллетень ====
     public boolean verify(BigInteger n, BigInteger signature) {
         BigInteger h = sha3(n.toString());
-        BigInteger sCheck = signature.modPow(d, N);
+        BigInteger sCheck = PowerMod.calculate(signature, c, N);
         return sCheck.equals(h);
     }
-
-    public BigInteger getN() { return N; }
-    public BigInteger getC() { return c; }
 
     private BigInteger sha3(String s) {
         try {

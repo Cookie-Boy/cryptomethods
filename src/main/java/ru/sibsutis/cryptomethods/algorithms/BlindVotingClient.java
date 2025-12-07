@@ -1,5 +1,7 @@
 package ru.sibsutis.cryptomethods.algorithms;
 
+import ru.sibsutis.cryptomethods.core.math.PowerMod;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -10,10 +12,10 @@ public class BlindVotingClient {
     private final BigInteger N;
     private final BigInteger c;
 
-    private BigInteger n;       // Бюллетень
-    private BigInteger h;       // Хэш
-    private BigInteger r;       // Ослепляющий множитель
-    private BigInteger rInv;    // Обратный r
+    private BigInteger n;
+    private BigInteger h;
+    private BigInteger r;
+    private BigInteger rInv;
 
     public BlindVotingClient(BigInteger N, BigInteger c) {
         this.N = N;
@@ -23,9 +25,8 @@ public class BlindVotingClient {
     // ==== Клиент формирует бюллетень ====
     public BigInteger generateBallot(int vote) {
         BigInteger rnd512 = new BigInteger(512, new Random());
-        BigInteger v512 = BigInteger.valueOf(vote).shiftLeft(510);
-
-        n = rnd512.or(v512);
+        BigInteger v = BigInteger.valueOf(vote);
+        n = rnd512.shiftLeft(2).or(v);
         return n;
     }
 
@@ -44,16 +45,12 @@ public class BlindVotingClient {
 
         rInv = r.modInverse(N);
 
-        return h.multiply(r.modPow(c, N)).mod(N);
+        return h.multiply(PowerMod.calculate(r, c, N)).mod(N);
     }
 
-    // ==== Расслепление ====
     public BigInteger unblind(BigInteger sBlinded) {
         return sBlinded.multiply(rInv).mod(N);
     }
-
-    public BigInteger getN() { return n; }
-    public BigInteger getHash() { return h; }
 
     private BigInteger sha3(String s) {
         try {
