@@ -99,27 +99,24 @@ public class CryptoLibrary {
         BlindVotingServer server = new BlindVotingServer();
         server.generateKeys();
 
-        server.addAllowedVoter("alice");
-        server.addAllowedVoter("bob");
+        server.addAllowedVoter("Alice");
+        server.addAllowedVoter("Bob");
 
-        BlindVotingClient client = new BlindVotingClient(server.getN(), server.getD());
-
-        String voter = "alice";
-
-        if (!server.isAllowed(voter)) {
-            System.out.println("User cannot vote!");
-            return;
-        }
+        String voter = "Alice";
+        BlindVotingClient client = new BlindVotingClient(voter, server.getN(), server.getD());
 
         BigInteger ballot = client.generateBallot(1);
         BigInteger hash = client.computeHash();
         BigInteger blinded = client.blind();
 
-        BigInteger blindedSignature = server.signBlinded(blinded, voter);
+        BigInteger blindedSignature = server.signBlinded(blinded, client.getName());
         BigInteger signature = client.unblind(blindedSignature);
 
         boolean ok = server.verify(ballot, signature);
 
         System.out.println("Signature is correct: " + ok);
+
+//        System.out.println("Try to vote again...");
+//        blindedSignature = server.signBlinded(blinded, client.getName());
     }
 }
