@@ -46,7 +46,7 @@ public class ZeroKnowledgeProof {
     }
 
     public void calculate() {
-        for(int i = 0; i < 50; i++) {
+        for(int i = 0; i < 5 * edges.size(); i++) {
             int[] newColors = applyPermutation(generateColorPermutation());
             BigInteger[] r = new BigInteger[newColors.length];
             List<IterationData> data = new ArrayList<>();
@@ -88,6 +88,6 @@ public class ZeroKnowledgeProof {
 
         }
 
-        System.out.println("Alice is not lying with probability of e^-50");
+        System.out.println("Alice is not lying with probability of e^-5");
     }
 }
